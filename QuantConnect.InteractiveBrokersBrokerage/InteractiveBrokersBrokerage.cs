@@ -106,7 +106,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
         private IBAutomater.IBAutomater _ibAutomater;
 
         // Existing orders created in TWS can *only* be cancelled/modified when connected with ClientId = 0
-        private const int ClientId = 0;
+        private readonly int _clientId = Config.GetInt("ib-client-id", 0);
 
         // daily restart is at 23:45 local host time
         private static TimeSpan _heartBeatTimeLimit = new(23, 0, 0);
@@ -769,7 +769,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             var filter = new ExecutionFilter
             {
                 AcctCode = _account,
-                ClientId = ClientId,
+                ClientId = _clientId,
                 Exchange = exchange,
                 SecType = type ?? IB.SecurityType.Undefined,
                 Symbol = symbol,
@@ -882,7 +882,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
                     // we're going to try and connect several times, if successful break
                     Log.Trace("InteractiveBrokersBrokerage.Connect(): calling _client.ClientSocket.eConnect()");
-                    _client.ClientSocket.eConnect(_host, _port, ClientId);
+                    _client.ClientSocket.eConnect(_host, _port, _clientId);
 
                     if (!_connectEvent.WaitOne(TimeSpan.FromSeconds(15)))
                     {
@@ -1367,7 +1367,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 return;
             }
 
-            ValidateSubscription();
+            //ValidateSubscription();
 
             _isInitialized = true;
             _loadExistingHoldings = loadExistingHoldings;
@@ -1416,15 +1416,15 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
             // start IB Gateway
             var exportIbGatewayLogs = true; // Config.GetBool("ib-export-ibgateway-logs");
-            _ibAutomater = new IBAutomater.IBAutomater(ibDirectory, ibVersion, userName, password, tradingMode, port, exportIbGatewayLogs);
+            _ibAutomater = new IBAutomater.IBAutomater(ibDirectory, ibVersion, userName, password, tradingMode, host, port, exportIbGatewayLogs);
             _ibAutomater.OutputDataReceived += OnIbAutomaterOutputDataReceived;
             _ibAutomater.ErrorDataReceived += OnIbAutomaterErrorDataReceived;
             _ibAutomater.Exited += OnIbAutomaterExited;
             _ibAutomater.Restarted += OnIbAutomaterRestarted;
 
             try
-            {
-                CheckIbAutomaterError(_ibAutomater.Start(false));
+                {
+                    CheckIbAutomaterError(_ibAutomater.Start(false));
             }
             catch
             {
@@ -2869,7 +2869,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
             var ibOrder = new IBApi.Order
             {
-                ClientId = ClientId,
+                ClientId = _clientId,
                 OrderId = ibOrderId,
                 Account = _account,
                 Action = ConvertOrderDirection(direction),
