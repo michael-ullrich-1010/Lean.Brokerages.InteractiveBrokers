@@ -13,6 +13,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Description>QuantConnect LEAN InteractiveBrokers Brokerage: Brokerage Template plugin for Lean</Description>
+    <UserSecretsId>0c2e39b0-45ad-4ed3-9561-2f58e8c61066</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -26,6 +27,7 @@
     <Compile Include="..\..\QuantConnect\Common\Properties\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
 
